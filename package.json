@@ -1,0 +1,40 @@
+{
+  "name": "ollama-wrapper",
+  "version": "0.0.1",
+  "description": "A wrapper for the Ollama API meant to ease development with Ollama",
+  "keywords": [
+    "Ollama",
+    "Wrapper",
+    "API"
+  ],
+  "homepage": "https://github.com/Unity-Lab-AI/Ollama-Wrapper#readme",
+  "bugs": {
+    "url": "https://github.com/Unity-Lab-AI/Ollama-Wrapper/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Unity-Lab-AI/Ollama-Wrapper.git"
+  },
+  "license": "GPL-3.0",
+  "author": "hackall360/SpongeBong,Alfredo",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "ollama": "^0.5.12"
+  },
+  "devDependencies": {
+    "eslint": "^9.19.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}
