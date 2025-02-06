@@ -17,13 +17,14 @@
   },
   "license": "GPL-3.0",
   "author": "hackall360/SpongeBong,Alfredo",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "directories": {
     "doc": "docs",
     "test": "tests"
   },
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
