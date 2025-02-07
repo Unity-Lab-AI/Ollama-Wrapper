@@ -41,7 +41,7 @@ export async function generateCompletion(text, config = {}) {
 
             response.data.on('end', () => {
                 console.log("\n[Streaming Complete]");
-                resolve('');
+                resolve(fullResponse.trim().length > 0 ? fullResponse.trim() : "Error: No response received."); // ✅ Ensures response is not empty
             });
 
             response.data.on('error', error => {
@@ -51,7 +51,7 @@ export async function generateCompletion(text, config = {}) {
 
     } catch (error) {
         console.error("Error generating completion:", error.message);
-        return null;
+        return "Error: Generation failed.";
     }
 }
 
@@ -93,7 +93,7 @@ export async function chat(messages, config = {}) {
             response.data.on('end', () => {
                 console.log("\n[Chat Streaming Complete]");
                 rl.close();
-                resolve('');
+                resolve(fullResponse.trim().length > 0 ? fullResponse.trim() : "Error: No response received."); // ✅ Ensures response is not empty
             });
 
             response.data.on('error', error => {
@@ -103,7 +103,7 @@ export async function chat(messages, config = {}) {
 
     } catch (error) {
         console.error("Chat request failed:", error.message);
-        return null;
+        return "Error: Chat failed.";
     }
 }
 

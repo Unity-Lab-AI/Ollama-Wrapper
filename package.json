@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --experimental-vm-modules --no-warnings ./node_modules/jest/bin/jest.js --config jest.config.js"
   },
   "dependencies": {
     "axios": "^1.7.9",
