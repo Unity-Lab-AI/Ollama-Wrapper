@@ -1,4 +1,5 @@
 export default {
-    transform: {},
     testEnvironment: "node",
+    transform: {},  // ✅ No transformation needed for pure ESM
+    moduleFileExtensions: ["js"],
 };

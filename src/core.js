@@ -4,6 +4,7 @@ import readline from 'readline';
 
 dotenv.config();
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://127.0.0.1:11434';
+const CHAT_TIMEOUT = 80000; // ⏳ Increased timeout to 80s
 
 /**
  * Generate text completion from a prompt with streaming support.
@@ -40,11 +41,13 @@ export async function generateCompletion(text, config = {}) {
             });
 
             response.data.on('end', () => {
-                console.log("\n[Streaming Complete]");
-                resolve(fullResponse.trim().length > 0 ? fullResponse.trim() : "Error: No response received."); // ✅ Ensures response is not empty
+                console.log("\n✅ [Streaming Complete]");
+                response.data.destroy(); // ✅ Ensures cleanup
+                resolve(fullResponse.trim().length > 0 ? fullResponse.trim() : "❌ Error: No response received.");
             });
 
             response.data.on('error', error => {
+                response.data.destroy();
                 reject(`Error during streaming: ${error.message}`);
             });
         });
@@ -62,19 +65,24 @@ export async function generateCompletion(text, config = {}) {
  * @returns {Promise<string>}
  */
 export async function chat(messages, config = {}) {
-    try {
-        if (!Array.isArray(messages)) throw new Error('Messages must be an array.');
+    return new Promise(async (resolve, reject) => {
+        const controller = new AbortController(); // ✅ Create an abort controller
+        const timeout = setTimeout(() => {
+            controller.abort(); // ✅ Forcefully cancel the request
+            reject("❌ Error: Chat request timed out.");
+        }, CHAT_TIMEOUT);
 
-        const response = await axios.post(`${OLLAMA_HOST}/api/chat`, {
-            model: 'llama3.1:8b-instruct-q4_1',
-            messages,
-            stream: true,
-            ...config
-        }, { responseType: 'stream' });
+        try {
+            if (!Array.isArray(messages)) throw new Error('Messages must be an array.');
 
-        return new Promise((resolve, reject) => {
+            const response = await axios.post(`${OLLAMA_HOST}/api/chat`, {
+                model: 'llama3.1:8b-instruct-q4_1',
+                messages,
+                stream: true,
+                ...config
+            }, { responseType: 'stream', signal: controller.signal }); // ✅ Link abort signal
+
             let fullResponse = '';
-            const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
             response.data.on('data', chunk => {
                 try {
@@ -91,20 +99,24 @@ export async function chat(messages, config = {}) {
             });
 
             response.data.on('end', () => {
-                console.log("\n[Chat Streaming Complete]");
-                rl.close();
-                resolve(fullResponse.trim().length > 0 ? fullResponse.trim() : "Error: No response received."); // ✅ Ensures response is not empty
+                console.log("\n✅ [Chat Streaming Complete]");
+                clearTimeout(timeout);
+                response.data.destroy(); // ✅ Ensure the stream is properly closed
+                resolve(fullResponse.trim().length > 0 ? fullResponse.trim() : "❌ Error: No response received.");
             });
 
             response.data.on('error', error => {
-                reject(`Error during chat streaming: ${error.message}`);
+                clearTimeout(timeout);
+                response.data.destroy();
+                reject(`❌ Error during chat streaming: ${error.message}`);
             });
-        });
 
-    } catch (error) {
-        console.error("Chat request failed:", error.message);
-        return "Error: Chat failed.";
-    }
+        } catch (error) {
+            clearTimeout(timeout);
+            console.error("❌ Chat request failed:", error.message);
+            reject("❌ Error: Chat failed.");
+        }
+    });
 }
 
 /**
@@ -113,10 +125,8 @@ export async function chat(messages, config = {}) {
  */
 export async function listModels() {
     try {
-        // Direct API call for listing models
         const response = await axios.get(`${OLLAMA_HOST}/api/tags`);
         
-        // Ensure response structure is valid
         if (response.data && response.data.models) {
             return response.data.models.map(model => model.name);
         }

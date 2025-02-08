@@ -16,7 +16,7 @@
     "url": "git+https://github.com/Unity-Lab-AI/Ollama-Wrapper.git"
   },
   "license": "GPL-3.0",
-  "author": "hackall360/SpongeBong,Alfredo",
+  "author": "hackall360/SpongeBong,Alfreddo",
   "type": "module",
   "main": "index.js",
   "directories": {
