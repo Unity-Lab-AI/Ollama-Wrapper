@@ -2,6 +2,7 @@
 .env
 *.log
 log.txt
+package-lock.json
 
 # Ignored folders
 node_modules

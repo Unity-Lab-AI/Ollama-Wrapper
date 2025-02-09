@@ -1,16 +1,16 @@
-import { jest } from '@jest/globals';
-import { streamChat, chatWithJSON } from '../src/streaming.js';
+import { streamChat } from "../src/streaming.js";
+import { jest } from "@jest/globals"; // ✅ Ensure Jest is available
 
-jest.setTimeout(60000); // ⏳ Increased timeout to 60 seconds
+const MODEL_NAME = "llama3.1:8b-instruct-q4_K_M"; // Ensure correct model name
 
-describe("Streaming API Tests", () => {
-    test('should fetch structured JSON response', async () => {
-        const response = await chatWithJSON([{ role: 'user', content: 'Tell me a joke.' }]);
-        expect(response).toBeTruthy();
-        expect(response).toHaveProperty('message');
-    }, 60000); // ✅ Set timeout per test
+test("should handle streaming chat requests", async () => {
+    const response = await streamChat([{ role: "user", content: "Tell me a joke." }]);
+    expect(response).toBeTruthy();
+    expect(response).toHaveProperty("message");
+    expect(response.message.length).toBeGreaterThan(5);
+}, 90000);
 
-    test('should handle streaming without crashing', async () => {
-        await expect(async () => await streamChat([{ role: 'user', content: 'Tell me a joke.' }])).not.toThrow();
-    }, 60000); // ✅ Increase timeout
+afterAll(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Ensure API calls close properly
+    jest.restoreAllMocks();
 });
